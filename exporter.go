@@ -89,6 +89,10 @@ func getMetrics() {
   }
 }
 
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, "ok")
+}
+
 
 func main(){
   timer := time.NewTicker(5* time.Second)
@@ -102,7 +106,7 @@ func main(){
       }
     }
   }()
-  
+  http.HandleFunc("/",rootHandler)
   http.Handle("/metrics", promhttp.Handler())
   port := 9100
   addr := fmt.Sprintf(":%d", port)
