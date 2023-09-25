@@ -1,7 +1,7 @@
 ## build
 ```
-docker build -t airfansyah/debezium-exporter:amd64 -f Dockerfile.amd64 .
-docker build -t airfansyah/debezium-exporter:ppc64le -f Dockerfile.ppc64le .
+docker build --platform linux/amd64 -t airfansyah/debezium-exporter:amd64 -f Dockerfile.amd64 .
+docker build --platform linux/ppc64le -t airfansyah/debezium-exporter:ppc64le -f Dockerfile.ppc64le .
 
 docker push airfansyah/debezium-exporter:amd64
 docker push airfansyah/debezium-exporter:ppc64le
