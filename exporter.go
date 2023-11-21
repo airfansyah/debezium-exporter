@@ -8,6 +8,7 @@ import (
   "strconv"
   "time"
   "os"
+  "strings"
   "github.com/prometheus/client_golang/prometheus"
   "github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -18,7 +19,7 @@ var (
       Name: "debezium_connector_state",
       Help: "Debezium connector state",
     },
-    []string{"connector_name"},
+    []string{"app", "connector_name"},
   )
 )
 
@@ -28,7 +29,7 @@ var (
       Name: "debezium_task_state",
       Help: "Debezium task state",
     },
-    []string{"connector_name", "task_id"},
+    []string{"app", "connector_name", "task_id"},
   )
 )
 
@@ -52,41 +53,49 @@ type Status struct {
 }
 
 func getMetrics() {
-  url := os.Getenv("DEBEZIUM_URL")
-  if url == "" {
-    fmt.Println("no url")
-    return
-  }
-  response, err := http.Get(url)
-  if err != nil {
-    fmt.Println("can not connect to",url)
-    return
-  }
-  defer response.Body.Close()
-  body, _ := ioutil.ReadAll(response.Body)
-  
-  var data map[string]struct {
-    Status `json:"status"`
-  }
-  
-  json.Unmarshal(body,&data)
-  
-  for key, value := range data {
-    conStatNum := 0.0
-    if value.Connector.State == "RUNNING" {
-      conStatNum = 1.0
-    }
-    debeziumConnectorState.WithLabelValues(key).Set(conStatNum)
-    for _, task := range value.Tasks {
-      taskID := strconv.Itoa(task.ID)
-      taskStatNum := 0.0
-      if task.State == "RUNNING" {
-        taskStatNum = 1.0
-      }
-      debeziumTaskState.WithLabelValues(key, taskID).Set(taskStatNum)
+  urls := os.Getenv("DEBEZIUM_URL")
+  urlList := strings.Split(urls, ",")
+
+  for _, url:= range urlList {
+      app := strings.Split(url, ".")[0]
+
       
-    }
+      if url == "" {
+        fmt.Println("no url")
+        return
+      }
+      response, err := http.Get("http://" + url + "/connectors?expand=status")
+      if err != nil {
+        fmt.Println("can not connect to",url)
+        return
+      }
+      defer response.Body.Close()
+      body, _ := ioutil.ReadAll(response.Body)
+      
+      var data map[string]struct {
+        Status `json:"status"`
+      }
+      
+      json.Unmarshal(body,&data)
+      
+      for key, value := range data {
+        conStatNum := 0.0
+        if value.Connector.State == "RUNNING" {
+          conStatNum = 1.0
+        }
+        debeziumConnectorState.WithLabelValues(app, key).Set(conStatNum)
+        for _, task := range value.Tasks {
+          taskID := strconv.Itoa(task.ID)
+          taskStatNum := 0.0
+          if task.State == "RUNNING" {
+            taskStatNum = 1.0
+          }
+          debeziumTaskState.WithLabelValues(app, key, taskID).Set(taskStatNum)
+          
+        }
+      }
   }
+
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
