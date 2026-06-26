@@ -1,7 +1,105 @@
+# ==========================================
+# 1. Credentials & Secrets (CRITICAL)
+# ==========================================
+*.pem
+*.pkcs12
+*.pfx
+*.p10
+*.p7b
+*.gal
+*.p8
+*.pub
+*.key
+*.crt
+id_rsa
+id_ed25519
+*.env
+*.env.local
+*.env.*.local
+.envrc
+secrets.yaml
+
+# ==========================================
+# 2. Terraform / OpenTofu
+# ==========================================
+# Ignore local state files (contain sensitive data)
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Ignore dependency directories and provider mirrors
+.terraform/
+.terraform.lock.hcl
+
+# Ignore sensitive variable files (use *.tfvars.example instead)
+*.tfvars
+*.tfvars.json
+
+# Ignore crash logs
+crash.log
+crash.*.log
+
+# ==========================================
+# 3. Kubernetes / Helm /编排
+# ==========================================
+# Local cluster configurations
+.kube/
+kubeconfig
+kubeconfig.yaml
+kubeconfig.pem
+
+# Helm chart dependencies and builds
+charts/
+chart/charts/
+.helm/
+*.tgz
+
+# Ansible retry files
+*.retry
+
+# ==========================================
+# 4. JavaScript / NodeJS
+# ==========================================
+node_modules/
+/dist
+/build
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ==========================================
+# 5. Go / Compiled Binaries
+# ==========================================
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/bin/
+
+# ==========================================
+# 6. IDEs & Text Editors
+# ==========================================
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# ==========================================
+# 7. Operating System Artifacts
+# ==========================================
 .DS_Store
-.git
-.bak
-.mp3
-.ini
-.exe
-.env
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
